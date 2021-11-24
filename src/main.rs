@@ -5,17 +5,19 @@ use regex::Regex;
 use scraper::{Html, Selector};
 
 mod t_characters;
-use crate::t_characters::{Character, CharacterRarity, CharacterType};
+use crate::t_characters::{Character, CharacterRarity, CharacterType, CharacterSelectors};
 
 struct Scraper {
     base_url: String,
-    client: reqwest::Client
+    client: reqwest::Client,
+    selectors: CharacterSelectors
 }
 impl Scraper {
     fn new() -> Self {
         let inst = Self {
             base_url: "https://cookierunkingdom.fandom.com".to_string(),
-            client: reqwest::Client::new()
+            client: reqwest::Client::new(),
+            selectors: CharacterSelectors::new()
         };
         return inst
     }
@@ -31,15 +33,15 @@ impl Scraper {
     }
     async fn get_character(&self, url: &String) -> Result<Character, Box<dyn std::error::Error>> {
         let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, url)).send().await?.text().await?);
-        let mut temptype = document.select(&Selector::parse("[data-source='role']").unwrap()).last().unwrap().text().collect::<String>();
+        let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
         temptype.remove(0);
         let characterinst = Character {
-            name: document.select(&Selector::parse(".page-header__title#firstHeading").unwrap())
+            name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
             r#type: CharacterType::from_str(temptype.as_str()).unwrap_or(CharacterType::Null),
-            imagepath: Regex::new(r"/revision/.*").unwrap().replace(document.select(&Selector::parse(".pi-image-thumbnail").unwrap())
+            imagepath: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
-            rarity: CharacterRarity::from_str(document.select(&Selector::parse("[data-source='rarity'] img").unwrap())
+            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity)
             .next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).unwrap_or(CharacterRarity::Null)
         };
         Ok(characterinst)

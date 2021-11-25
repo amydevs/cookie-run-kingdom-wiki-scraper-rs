@@ -1,54 +1,7 @@
 use std::{fs, io::{self, Write}, ops::Add, path::Path};
 
-use std::{str::FromStr};
-
-use regex::Regex;
-
-use scraper::{Html, Selector};
-
-mod t_characters;
-use crate::t_characters::{Character, CharacterRarity, CharacterType, CharacterSelectors};
-
-struct Scraper {
-    base_url: String,
-    client: reqwest::Client,
-    selectors: CharacterSelectors
-}
-impl Scraper {
-    fn new() -> Self {
-        let inst = Self {
-            base_url: "https://cookierunkingdom.fandom.com".to_owned(),
-            client: reqwest::Client::new(),
-            selectors: CharacterSelectors::new()
-        };
-        return inst
-    }
-    async fn get_characters_urls(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-        let mut urls:Vec<String> = vec![];
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
-        let selector = Selector::parse(".wikitable > tbody th > a:not(.image)").unwrap();
-        for element in document.select(&selector) {
-            
-            urls.push(element.value().attr("href").unwrap_or_default().to_owned());
-        }
-        Ok(urls)
-    }
-    async fn get_character(&self, url: &String) -> Result<Character, Box<dyn std::error::Error>> {
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, url)).send().await?.text().await?);
-        let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
-        temptype.remove(0);
-        let characterinst = Character {
-            name: document.select(&self.selectors.name)
-                .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
-            r#type: CharacterType::from_str(temptype.as_str()).unwrap_or(CharacterType::Null),
-            imagepath: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
-            .next().unwrap().value().attr("src").unwrap(), "").to_string(),
-            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity)
-            .next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).unwrap_or(CharacterRarity::Null)
-        };
-        Ok(characterinst)
-    }
-}
+mod scraper;
+use crate::scraper::{Scraper, TScraper::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

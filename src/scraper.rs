@@ -38,7 +38,7 @@ impl Scraper {
             name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
             r#type: CharacterType::from_str(temptype.as_str()).unwrap_or(CharacterType::Null),
-            imagepath: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
+            image_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
             rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity)
             .next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).unwrap_or(CharacterRarity::Null)
@@ -52,12 +52,13 @@ pub mod TScraper {
     use strum_macros::EnumString;
     use scraper::Selector;
 
+    
     #[derive(Serialize, Deserialize, Debug)]
+    #[serde(rename_all = "camelCase")]
     pub struct Character {
         pub name: String,
         pub r#type: CharacterType,
-        pub imagepath: String,
-        
+        pub image_path: String,
         pub rarity: CharacterRarity
     }
 

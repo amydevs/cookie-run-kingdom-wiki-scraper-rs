@@ -23,11 +23,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut character = scraper.get_character(url).await?;
         
         // Save image
-        let imageres = scraper.client.get(&character.imagepath).send().await?.bytes().await?;
+        let imageres = scraper.client.get(&character.image_path).send().await?.bytes().await?;
         let imagepath = &assetspath.join(character.name.to_owned() + ".png");
         fs::write(imagepath, imageres).expect("Image could not be written.");
         let temprelpath = imagepath.to_str().unwrap().to_owned().replace(&basepath.to_str().unwrap(), "./");
-        character.imagepath = temprelpath;
+        character.image_path = temprelpath;
         print!("\r\x1b[K{:.1}% Done | Cookie {} of {} | {}", (i as f32/allcharactersurls.len() as f32)*100.0, i+1, allcharactersurls.len(), &character.name);
         io::stdout().flush().unwrap();
         allcharacters.push(character);

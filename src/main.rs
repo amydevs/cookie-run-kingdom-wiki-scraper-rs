@@ -1,10 +1,19 @@
-use std::{fs, io::{self, Write}, ops::Add, path::Path};
+use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 
 mod scraper;
 use crate::scraper::{Scraper, TScraper::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = env::args().collect();
+    let mut saveimgflag = false;
+    for arg in &args {
+        match arg.as_str() {
+            "--save-img" => saveimgflag = true,
+            &_ => continue
+        }
+    }
+    
     let mut basepathtmp = "./scraper_output".to_owned();
     if !basepathtmp.ends_with(std::path::MAIN_SEPARATOR) { basepathtmp = basepathtmp.add(std::path::MAIN_SEPARATOR.to_string().as_str()); }
     let basepath = Path::new(&basepathtmp);
@@ -23,11 +32,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut character = scraper.get_character(url).await?;
         
         // Save image
-        let imageres = scraper.client.get(&character.image_path).send().await?.bytes().await?;
-        let imagepath = &assetspath.join(character.name.to_owned() + ".png");
-        fs::write(imagepath, imageres).expect("Image could not be written.");
-        let temprelpath = imagepath.to_str().unwrap().to_owned().replace(&basepath.to_str().unwrap(), "./");
-        character.image_path = temprelpath;
+        if saveimgflag {
+            let imageres = scraper.client.get(&character.image_path).send().await?.bytes().await?;
+            let imagepath = &assetspath.join(character.name.to_owned() + ".png");
+            fs::write(imagepath, imageres).expect("Image could not be written.");
+            let temprelpath = imagepath.to_str().unwrap().to_owned().replace(&basepath.to_str().unwrap(), "./");
+            character.image_path = temprelpath;
+        }
+
         print!("\r\x1b[K{:.1}% Done | Cookie {} of {} | {}", (i as f32/allcharactersurls.len() as f32)*100.0, i+1, allcharactersurls.len(), &character.name);
         io::stdout().flush().unwrap();
         allcharacters.push(character);

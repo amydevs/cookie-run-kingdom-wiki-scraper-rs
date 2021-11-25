@@ -34,14 +34,14 @@ impl Scraper {
         let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, url)).send().await?.text().await?);
         let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
         temptype.remove(0);
+        
         let characterinst = Character {
             name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
-            r#type: CharacterType::from_str(temptype.as_str()).unwrap_or(CharacterType::Null),
+            r#type: CharacterType::from_str(temptype.as_str()).ok(),
             image_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
-            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity)
-            .next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).unwrap_or(CharacterRarity::Null)
+            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok()
         };
         Ok(characterinst)
     }
@@ -58,9 +58,9 @@ pub mod TScraper {
     #[serde(rename_all = "camelCase")]
     pub struct Character {
         pub name: String,
-        pub r#type: CharacterType,
+        pub r#type: Option<CharacterType>,
         pub image_path: String,
-        pub rarity: CharacterRarity
+        pub rarity: Option<CharacterRarity>
     }
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
@@ -73,8 +73,7 @@ pub mod TScraper {
         Healing,
         Magic,
         Ranged,
-        Support,
-        Null
+        Support
     }
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
@@ -85,8 +84,7 @@ pub mod TScraper {
         Rare,
         Epic,
         Legendary,
-        Ancient,
-        Null
+        Ancient
     }
 
     #[derive(Debug)]

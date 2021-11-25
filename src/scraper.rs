@@ -49,6 +49,7 @@ impl Scraper {
 
 pub mod TScraper {
     use serde::{Serialize, Deserialize};
+    use serde_repr::*;
     use strum_macros::EnumString;
     use scraper::Selector;
 
@@ -62,7 +63,8 @@ pub mod TScraper {
         pub rarity: CharacterRarity
     }
 
-    #[derive(Serialize, Deserialize, Debug, EnumString)]
+    #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
+    #[repr(u8)]
     pub enum CharacterType {
         Ambush,
         Bomber,
@@ -75,7 +77,8 @@ pub mod TScraper {
         Null
     }
 
-    #[derive(Serialize, Deserialize, Debug, EnumString)]
+    #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
+    #[repr(u8)]
     pub enum CharacterRarity {
         Special,
         Common,

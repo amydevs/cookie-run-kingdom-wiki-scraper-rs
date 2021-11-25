@@ -36,6 +36,7 @@ pub enum CharacterRarity {
     Null
 }
 
+#[derive(Debug)]
 pub struct CharacterSelectors {
     pub name: Selector,
     pub r#type: Selector,

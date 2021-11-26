@@ -33,20 +33,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let scraper = Scraper::new();
 
-    // rarity percentages
-    if saveraritychanceflag {
-        println!("Getting Gacha Chance Percentages");
-        let allraritychance = scraper.get_rarity_chances().await.unwrap_or(vec![]);
-        fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");
-    }
-
-    // treasures (kinda buggy atm)
-    if savetreasuresflag {
-        println!("Getting Gacha Chance Percentages");
-        let alltreasures = scraper.get_treasures().await.unwrap_or(vec![]);
-        fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");
-    }
-
     // url's of all characters
     let allcharactersurls = scraper.get_characters_urls().await?;
     println!("Getting Info for {} Cookies", allcharactersurls.len());
@@ -69,5 +55,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         allcharacters.push(character);
     }
     fs::write(cookiesjsonpath, serde_json::to_string_pretty(&allcharacters).unwrap()).expect("JSON could not be written.");
+
+    // rarity percentages
+    if saveraritychanceflag {
+        println!("Getting Gacha Chance Percentages");
+        let allraritychance = scraper.get_rarity_chances().await.unwrap_or(vec![]);
+        fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");
+    }
+
+    // treasures (kinda buggy atm)
+    if savetreasuresflag {
+        println!("Getting Treasures");
+        let alltreasures = scraper.get_treasures().await.unwrap_or(vec![]);
+        fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");
+    }
+
     Ok(())
 }

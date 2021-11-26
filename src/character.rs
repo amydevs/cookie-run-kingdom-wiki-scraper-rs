@@ -107,8 +107,7 @@ pub mod TScraper {
 
     #[derive(Debug, EnumString)]
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr))]
-    #[repr(u8)]
+    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
 
     pub enum CharacterType {
         Ambush,
@@ -123,8 +122,7 @@ pub mod TScraper {
 
     #[derive(Debug, EnumString)]
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr))]
-    #[repr(u8)]
+    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
 
     pub enum CharacterRarity {
         Special,
@@ -137,8 +135,7 @@ pub mod TScraper {
 
     #[derive(Debug, EnumString)]
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr))]
-    #[repr(u8)]
+    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
 
     pub enum CharacterPos {
         Rear,

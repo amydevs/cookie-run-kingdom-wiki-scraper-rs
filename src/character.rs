@@ -107,6 +107,7 @@ pub mod TScraper {
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
     #[repr(u8)]
+// #[derive(Serialize, Deserialize, Debug, EnumString)]
     pub enum CharacterType {
         Ambush,
         Bomber,
@@ -120,6 +121,7 @@ pub mod TScraper {
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
     #[repr(u8)]
+// #[derive(Serialize, Deserialize, Debug, EnumString)]
     pub enum CharacterRarity {
         Special,
         Common,
@@ -131,6 +133,7 @@ pub mod TScraper {
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
     #[repr(u8)]
+// #[derive(Serialize, Deserialize, Debug, EnumString)]
     pub enum CharacterPos {
         Rear,
         Middle,

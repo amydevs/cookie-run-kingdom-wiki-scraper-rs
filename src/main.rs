@@ -8,11 +8,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // arguments parsed
     let mut saveimgflag = false;
     let mut saveraritychanceflag = false;
+    let mut savetreasuresflag = false;
     let args: Vec<String> = env::args().collect();
     for arg in &args {
         match arg.as_str() {
             "--save-img" => saveimgflag = true,
             "--save-chances" => saveraritychanceflag = true,
+            "--save-treasures" => savetreasuresflag = true,
             &_ => continue
         }
     }
@@ -38,8 +40,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");
     }
 
-    // treasures
-    if saveraritychanceflag {
+    // treasures (kinda buggy atm)
+    if savetreasuresflag {
         println!("Getting Gacha Chance Percentages");
         let alltreasures = scraper.get_treasures().await.unwrap_or(vec![]);
         fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");

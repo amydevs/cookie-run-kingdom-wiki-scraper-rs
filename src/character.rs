@@ -1,10 +1,10 @@
-use std::{str::FromStr};
+use std::{str::FromStr, vec};
 
 use regex::Regex;
 
 use scraper::{Html, Selector, element_ref::Select};
 
-use TScraper::*;
+use Typesand::*;
 
 pub struct Scraper {
     base_url: String,
@@ -85,10 +85,24 @@ impl Scraper {
     fn getf32fromsel(&self, s: &mut Select) -> f32 {
         s.next().unwrap().inner_html().replace("\n", "").replace("%", "").parse().unwrap_or(0.0)
     }
+
+    pub async fn get_treasures(&self) -> Result<Vec<Treasure>, Box<dyn std::error::Error>> {
+        let mut temptreasures: Vec<Treasure> = vec![];
+        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/Gacha")).send().await?.text().await?);
+        let sel = Selector::parse("th[style='text-align:left']").unwrap();
+        for e in document.select(&sel) {
+            let first_child = e.first_child().unwrap().value().as_element().unwrap();
+            temptreasures.push(Treasure {
+                name: first_child.attr("title").unwrap().to_owned(),
+                image_path: Regex::new(r"/revision/.*").unwrap().replace(first_child.attr("href").unwrap(), "").to_string()
+            })
+        }
+        Ok(temptreasures)
+    }
     
 }
 
-pub mod TScraper {
+pub mod Typesand {
     use serde::{Serialize, Deserialize};
     use serde_repr::*;
     use strum_macros::EnumString;
@@ -168,5 +182,11 @@ pub mod TScraper {
         pub rarity: Option<CharacterRarity>,
         pub cookie: f32,
         pub soulstone: f32
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Treasure {
+        pub name: String,
+        pub image_path: String,
     }
 }

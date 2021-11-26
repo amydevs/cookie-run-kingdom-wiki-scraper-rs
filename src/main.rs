@@ -1,7 +1,7 @@
 use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 
 mod character;
-use crate::character::{Scraper, TScraper::Character};
+use crate::character::{Scraper, Typesand::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,6 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let basepath = Path::new(&basepathtmp);
     let cookiesjsonpath = basepath.join("cookies.json");
     let charrarityjsonpath = basepath.join("cookies_rarity.json");
+    let treasuresjsonpath = basepath.join("treasures.json");
     let assetspath = basepath.join("assets");
 
     fs::create_dir_all(&assetspath).expect("Could not access fs.");
@@ -37,6 +38,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");
     }
 
+    // treasures
+    if saveraritychanceflag {
+        println!("Getting Gacha Chance Percentages");
+        let alltreasures = scraper.get_treasures().await.unwrap_or(vec![]);
+        fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");
+    }
+
     // url's of all characters
     let allcharactersurls = scraper.get_characters_urls().await?;
     println!("Getting Info for {} Cookies", allcharactersurls.len());
@@ -44,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut allcharacters:Vec<Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
         let mut character = scraper.get_character(url).await?;
-        
+        if i == 4 {break;}
         // Save image
         if saveimgflag {
             let imageres = scraper.client.get(&character.image_path).send().await?.bytes().await?;

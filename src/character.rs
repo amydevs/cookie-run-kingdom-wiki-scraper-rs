@@ -88,7 +88,7 @@ impl Scraper {
 
     pub async fn get_treasures(&self) -> Result<Vec<Treasure>, Box<dyn std::error::Error>> {
         let mut temptreasures: Vec<Treasure> = vec![];
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/Gacha")).send().await?.text().await?);
+        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/Treasures")).send().await?.text().await?);
         let sel = Selector::parse("th[style='text-align:left']").unwrap();
         for e in document.select(&sel) {
             let first_child = e.first_child().unwrap().value().as_element().unwrap();

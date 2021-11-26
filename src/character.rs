@@ -20,6 +20,15 @@ impl Scraper {
         };
         return inst
     }
+    pub fn from_client(client: reqwest::Client) -> Self {
+        let inst = Self {
+            base_url: "https://cookierunkingdom.fandom.com".to_owned(),
+            client: client,
+            selectors: CharacterSelectors::new()
+        };
+        return inst
+    }
+    
     pub async fn get_characters_urls(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let mut urls:Vec<String> = vec![];
         let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);

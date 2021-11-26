@@ -1,7 +1,7 @@
 use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 
-mod scraper;
-use crate::scraper::{Scraper, TScraper::Character};
+mod character;
+use crate::character::{Scraper, TScraper::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !basepathtmp.ends_with(std::path::MAIN_SEPARATOR) { basepathtmp = basepathtmp.add(std::path::MAIN_SEPARATOR.to_string().as_str()); }
     let basepath = Path::new(&basepathtmp);
     let cookiesjsonpath = basepath.join("cookies.json");
-    let charrarityjsonpath = basepath.join("cookie_rarity.json");
+    let charrarityjsonpath = basepath.join("cookies_rarity.json");
     let assetspath = basepath.join("assets");
 
     fs::create_dir_all(&assetspath).expect("Could not access fs.");
@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let scraper = Scraper::new();
 
     // rarity percentages
-    if (saveraritychanceflag){
+    if saveraritychanceflag {
         println!("Getting Gacha Chance Percentages");
         let allraritychance = scraper.get_rarity_chances().await.unwrap_or(vec![]);
         fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");

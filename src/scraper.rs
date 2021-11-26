@@ -4,7 +4,7 @@ use regex::Regex;
 
 use scraper::{Html, Selector};
 
-use TScraper::{Character, CharacterRarity, CharacterSelectors, CharacterType};
+use TScraper::*;
 
 pub struct Scraper {
     base_url: String,
@@ -34,6 +34,9 @@ impl Scraper {
         let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, url)).send().await?.text().await?);
         let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
         temptype.remove(0);
+
+        let mut temppos = document.select(&self.selectors.position).last().unwrap().text().collect::<String>();
+        temppos.remove(0);
         
         let characterinst = Character {
             name: document.select(&self.selectors.name)
@@ -41,7 +44,8 @@ impl Scraper {
             r#type: CharacterType::from_str(temptype.as_str()).ok(),
             image_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
-            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok()
+            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),
+            position: CharacterPos::from_str(temppos.as_str()).ok()
         };
         Ok(characterinst)
     }
@@ -60,7 +64,8 @@ pub mod TScraper {
         pub name: String,
         pub r#type: Option<CharacterType>,
         pub image_path: String,
-        pub rarity: Option<CharacterRarity>
+        pub rarity: Option<CharacterRarity>,
+        pub position: Option<CharacterPos>
     }
 
     #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
@@ -87,12 +92,21 @@ pub mod TScraper {
         Ancient
     }
 
+    #[derive(Serialize_repr, Deserialize_repr, Debug, EnumString)]
+    #[repr(u8)]
+    pub enum CharacterPos {
+        Rear,
+        Middle,
+        Front
+    }
+
     #[derive(Debug)]
     pub struct CharacterSelectors {
         pub name: Selector,
         pub r#type: Selector,
         pub imagepath: Selector,
-        pub rarity: Selector
+        pub rarity: Selector,
+        pub position: Selector
     }
     impl CharacterSelectors {
         pub fn new() -> Self {
@@ -100,7 +114,8 @@ pub mod TScraper {
                 name: Selector::parse(".page-header__title#firstHeading").unwrap(),
                 r#type: Selector::parse("[data-source='role']").unwrap(),
                 imagepath: Selector::parse(".pi-image-thumbnail").unwrap(),
-                rarity: Selector::parse("[data-source='rarity'] img").unwrap()
+                rarity: Selector::parse("[data-source='rarity'] img").unwrap(),
+                position: Selector::parse("td[data-source='position']").unwrap()
             }
         }
     }

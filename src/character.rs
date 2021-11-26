@@ -34,8 +34,9 @@ impl Scraper {
         let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
         let selector = Selector::parse(".wikitable > tbody th > a:not(.image)").unwrap();
         for element in document.select(&selector) {
-            
-            urls.push(element.value().attr("href").unwrap_or_default().to_owned());
+            if !element.inner_html().contains("non-playable") {
+                urls.push(element.value().attr("href").unwrap_or_default().to_owned());
+            }
         }
         Ok(urls)
     }

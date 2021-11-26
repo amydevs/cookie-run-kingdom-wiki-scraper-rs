@@ -43,7 +43,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // filling vector with characters
     let mut allcharacters:Vec<Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
-        if i == 4 {break;}
         let mut character = scraper.get_character(url).await?;
         
         // Save image

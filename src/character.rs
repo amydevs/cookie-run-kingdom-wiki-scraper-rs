@@ -4,7 +4,7 @@ use regex::Regex;
 
 use scraper::{Html, Selector, element_ref::Select};
 
-use Typesand::*;
+use typesand::*;
 
 pub struct Scraper {
     base_url: String,
@@ -102,7 +102,7 @@ impl Scraper {
     
 }
 
-pub mod Typesand {
+pub mod typesand {
     use serde::{Serialize, Deserialize};
     use strum_macros::EnumString;
     use scraper::Selector;

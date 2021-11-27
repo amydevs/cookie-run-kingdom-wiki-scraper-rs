@@ -1,1 +1,1 @@
-cargo run --features use-enum-u8 -- --save-chances
+cargo run --features enum-u8 -- --save-chances

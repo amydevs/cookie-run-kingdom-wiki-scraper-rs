@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     for arg in &args {
         match arg.as_str() {
-            "--save-img" => saveimgflag = true,
+            "--save-imgs" => saveimgflag = true,
             "--save-chances" => saveraritychanceflag = true,
             "--save-treasures" => savetreasuresflag = true,
             &_ => continue

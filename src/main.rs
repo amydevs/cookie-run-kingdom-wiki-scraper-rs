@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn repr_bindings() {
         let bindingspath = Path::new("./bindings");
-        let regexsearch = Regex::new(r#"".*?""#).unwrap();
+        let regexsearch = Regex::new(r#""\S*?""#).unwrap();
         if bindingspath.exists() {
             let paths = fs::read_dir(bindingspath).unwrap();
 

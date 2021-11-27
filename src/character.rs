@@ -107,9 +107,12 @@ pub mod Typesand {
     use serde_repr::*;
     use strum_macros::EnumString;
     use scraper::Selector;
+    use ts_rs::TS;
 
-    
-    #[derive(Serialize, Deserialize, Debug)]
+
+
+    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[ts(export)]
     #[serde(rename_all = "camelCase")]
     pub struct Character {
         pub name: String,
@@ -119,10 +122,10 @@ pub mod Typesand {
         pub position: Option<CharacterPos>
     }
 
-    #[derive(Debug, EnumString)]
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-
+    #[derive(TS, Debug, EnumString)]
+    #[ts(export)]
     pub enum CharacterType {
         Ambush,
         Bomber,
@@ -134,10 +137,10 @@ pub mod Typesand {
         Support
     }
 
-    #[derive(Debug, EnumString)]
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-
+    #[derive(TS, Debug, EnumString)]
+    #[ts(export)]
     pub enum CharacterRarity {
         Special,
         Common,
@@ -147,10 +150,11 @@ pub mod Typesand {
         Ancient
     }
 
-    #[derive(Debug, EnumString)]
+    
     #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-
+    #[derive(TS, Debug, EnumString)]
+    #[ts(export)]
     pub enum CharacterPos {
         Rear,
         Middle,
@@ -177,14 +181,18 @@ pub mod Typesand {
         }
     }
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[ts(export)]
+    #[serde(rename_all = "camelCase")]
     pub struct RarityChances {
         pub rarity: Option<CharacterRarity>,
         pub cookie: f32,
         pub soulstone: f32
     }
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[ts(export)]
+    #[serde(rename_all = "camelCase")]
     pub struct Treasure {
         pub name: String,
         pub image_path: String,

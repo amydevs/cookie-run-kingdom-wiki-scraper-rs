@@ -72,3 +72,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[cfg(all(test, feature = "use-repr"))]
+mod tests {
+    // ts bindings regex: (?<=(\||=)\s*").*?(?=")
+
+    use super::*;
+    use std::path::Path;
+    use regex::{Match, Regex};
+
+    #[test]
+    fn repr_bindings() {
+        let bindingspath = Path::new("./bindings");
+        let regexsearch = Regex::new(r#"".*?""#).unwrap();
+        if bindingspath.exists() {
+            let paths = fs::read_dir(bindingspath).unwrap();
+
+            for path in paths {
+                let actualpath = path.unwrap().path();
+                let data = fs::read_to_string(&actualpath).unwrap();
+                let firstline = data.lines().next().unwrap();
+                if firstline.starts_with("export type ") {
+                    let mut tempdata = String::from(format!("export enum {} {{\n", firstline.split("export type ").last().unwrap().split(" =").next().unwrap()));
+                    regexsearch.find_iter(data.as_str()).enumerate().for_each(|(i, m)| {
+                        let mut tempchars = m.as_str().chars();
+                        tempchars.next();
+                        tempchars.next_back();
+                        let mut templine = format!("  {}", tempchars.as_str());
+                        if i == 0 {
+                            templine.push_str(format!(" = {}", i).as_str());
+                        }
+                        templine.push_str(",\n");
+                        tempdata.push_str(templine.as_str());
+                    });
+                    tempdata.push_str("}");
+                    fs::write(actualpath, tempdata).unwrap();
+                }
+            }
+        }
+    }
+}

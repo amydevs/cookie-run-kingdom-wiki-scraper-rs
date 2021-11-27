@@ -104,12 +104,12 @@ impl Scraper {
 
 pub mod Typesand {
     use serde::{Serialize, Deserialize};
-    use serde_repr::*;
     use strum_macros::EnumString;
     use scraper::Selector;
     use ts_rs::TS;
 
-
+    #[cfg(feature = "use-repr")]
+    use serde_repr::*;
 
     #[derive(Serialize, Deserialize, TS, Debug)]
     #[ts(export)]

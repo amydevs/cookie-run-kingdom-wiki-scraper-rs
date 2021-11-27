@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[cfg(all(test, feature = "use-repr"))]
+#[cfg(all(test, feature = "use-enum-u8"))]
 mod tests {
     // ts bindings regex: (?<=(\||=)\s*").*?(?=")
 

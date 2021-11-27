@@ -108,7 +108,7 @@ pub mod Typesand {
     use scraper::Selector;
     use ts_rs::TS;
 
-    #[cfg(feature = "use-repr")]
+    #[cfg(feature = "use-enum-u8")]
     use serde_repr::*;
 
     #[derive(Serialize, Deserialize, TS, Debug)]
@@ -122,8 +122,8 @@ pub mod Typesand {
         pub position: Option<CharacterPos>
     }
 
-    #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
+    #[cfg_attr(not(feature = "use-enum-u8"), derive(Serialize, Deserialize))]
+    #[cfg_attr(feature = "use-enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
     #[derive(TS, Debug, EnumString)]
     #[ts(export)]
     pub enum CharacterType {
@@ -137,8 +137,8 @@ pub mod Typesand {
         Support
     }
 
-    #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
+    #[cfg_attr(not(feature = "use-enum-u8"), derive(Serialize, Deserialize))]
+    #[cfg_attr(feature = "use-enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
     #[derive(TS, Debug, EnumString)]
     #[ts(export)]
     pub enum CharacterRarity {
@@ -151,8 +151,8 @@ pub mod Typesand {
     }
 
     
-    #[cfg_attr(not(feature = "use-repr"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "use-repr", derive(Serialize_repr, Deserialize_repr), repr(u8))]
+    #[cfg_attr(not(feature = "use-enum-u8"), derive(Serialize, Deserialize))]
+    #[cfg_attr(feature = "use-enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
     #[derive(TS, Debug, EnumString)]
     #[ts(export)]
     pub enum CharacterPos {

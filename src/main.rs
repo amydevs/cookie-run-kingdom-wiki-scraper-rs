@@ -41,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (i, url) in allcharactersurls.iter().enumerate() {
         let mut character = scraper.get_character(url).await?;
         
-        #[cfg(debug)]
+        #[cfg(feature = "debug")]
         if i == 4 {break;}
 
         // Save image

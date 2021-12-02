@@ -120,7 +120,8 @@ pub mod typesand {
     #[cfg(feature = "enum-u8")]
     use serde_repr::*;
 
-    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[derive(Serialize, Deserialize, TS)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
     #[ts(export)]
     #[serde(rename_all = "camelCase")]
     pub struct Character {
@@ -133,7 +134,8 @@ pub mod typesand {
 
     #[cfg_attr(not(feature = "enum-u8"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-    #[derive(TS, Debug, EnumString)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
+    #[derive(TS, EnumString)]
     #[ts(export)]
     pub enum CharacterType {
         Ambush,
@@ -148,7 +150,8 @@ pub mod typesand {
 
     #[cfg_attr(not(feature = "enum-u8"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-    #[derive(TS, Debug, EnumString)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
+    #[derive(TS, EnumString)]
     #[ts(export)]
     pub enum CharacterRarity {
         Special,
@@ -162,7 +165,8 @@ pub mod typesand {
     
     #[cfg_attr(not(feature = "enum-u8"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-    #[derive(TS, Debug, EnumString)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
+    #[derive(TS, EnumString)]
     #[ts(export)]
     pub enum CharacterPos {
         Rear,
@@ -190,7 +194,8 @@ pub mod typesand {
         }
     }
 
-    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[derive(Serialize, Deserialize, TS)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
     #[ts(export)]
     #[serde(rename_all = "camelCase")]
     pub struct RarityChances {
@@ -199,7 +204,8 @@ pub mod typesand {
         pub soulstone: f32
     }
 
-    #[derive(Serialize, Deserialize, TS, Debug)]
+    #[derive(Serialize, Deserialize, TS)]
+    #[cfg_attr(feature = "debug", derive(Debug))]
     #[ts(export)]
     #[serde(rename_all = "camelCase")]
     pub struct Treasure {

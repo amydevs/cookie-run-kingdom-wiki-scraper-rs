@@ -22,4 +22,5 @@ strum_macros = "0.23"
 regex = "1.5"
 
 [features]
+debug = []
 enum-u8 = ["serde_repr"] # use serde_repr on enums to de/serialize them with u8.

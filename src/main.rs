@@ -54,6 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         io::stdout().flush().unwrap();
         allcharacters.push(character);
     }
+    println!("");
     fs::write(cookiesjsonpath, serde_json::to_string_pretty(&allcharacters).unwrap()).expect("JSON could not be written.");
 
     // rarity percentages

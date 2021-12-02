@@ -7,11 +7,12 @@ cargo run
 
 # [Optional Compile-Time Features]
 # enum-u8 - Automatically represents enumerators as u8 enums.
+# debug - Adds debugging features, such as only looping for 4 cookies and Debug derive.
 # [Optional Arguments]
 # --save-imgs 
 # --save-chances 
 # -save-treasures
-cargo run --features enum-u8 -- --save-imgs --save-chances -save-treasures
+cargo run --features enum-u8,debug -- --save-imgs --save-chances -save-treasures
 ```
 
 ## Generate Typescript Types

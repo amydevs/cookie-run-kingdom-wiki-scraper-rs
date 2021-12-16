@@ -11,8 +11,8 @@ cargo run
 # [Optional Arguments]
 # --save-imgs 
 # --save-chances 
-# -save-treasures
-cargo run --features enum-u8,debug -- --save-imgs --save-chances -save-treasures
+# --save-treasures
+cargo run --features enum-u8,debug -- --save-imgs --save-chances --save-treasures
 ```
 
 ## Generate Typescript Types

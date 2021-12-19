@@ -1,11 +1,10 @@
 use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 
-mod character;
-mod rarity;
+mod api;
 mod tools;
 
-use crate::{tools::*, rarity::RarityTools};
-use crate::character::{CharacterTools, typesand::Character};
+use crate::{tools::*, api::rarity::RarityTools};
+use crate::api::character::{CharacterTools, typesand::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

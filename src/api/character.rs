@@ -5,7 +5,7 @@ use regex::Regex;
 use scraper::{Html, Selector, element_ref::Select, ElementRef};
 
 use typesand::*;
-use crate::{rarity::{rarity_types::{Rarity}}, tools::ClientWrapper};
+use crate::{api::rarity::{rarity_types::{Rarity}}, tools::ClientWrapper};
 
 pub struct CharacterTools<'a> {
     pub clientwrapper: &'a ClientWrapper,
@@ -77,7 +77,7 @@ impl<'a> CharacterTools<'a> {
 }
 
 pub mod typesand {
-    use crate::rarity::{rarity_types::{Rarity}};
+    use crate::api::rarity::{rarity_types::{Rarity}};
 
     use serde::{Serialize, Deserialize};
     use strum_macros::EnumString;

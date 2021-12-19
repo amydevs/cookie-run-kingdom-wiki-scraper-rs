@@ -3,8 +3,7 @@ use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 mod api;
 mod tools;
 
-use crate::{tools::*, api::rarity::RarityTools};
-use crate::api::character::{CharacterTools, typesand::Character};
+use crate::{tools::*, api::{character::*, rarity::*, treasure::*}};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -42,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let allcharactersurls = charactertools.get_characters_urls().await?;
     println!("Getting Info for {} Cookies", allcharactersurls.len());
     // filling vector with characters
-    let mut allcharacters:Vec<Character> = vec![];
+    let mut allcharacters:Vec<character_types::Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
         let mut character = charactertools.get_character(url).await?;
         
@@ -74,9 +73,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // treasures (kinda buggy atm)
+    let treasuretools = TreasureTools::from_clientwrapper(&clientwrapper);
     if savetreasuresflag {
         println!("Getting Treasures");
-        let alltreasures = charactertools.get_treasures().await.unwrap_or(vec![]);
+        let alltreasures = treasuretools.get_treasures().await.unwrap_or(vec![]);
         fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");
     }
 

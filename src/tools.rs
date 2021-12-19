@@ -1,4 +1,3 @@
-use reqwest::Client;
 use scraper::{element_ref::Select};
 
 pub fn getf32fromsel(s: &mut Select) -> f32 {

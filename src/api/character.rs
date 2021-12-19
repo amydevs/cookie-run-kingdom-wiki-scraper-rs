@@ -2,7 +2,7 @@ use std::{str::FromStr, vec};
 
 use regex::Regex;
 
-use scraper::{Html, Selector, element_ref::Select, ElementRef};
+use scraper::{Html, Selector};
 
 use character_types::*;
 use crate::{api::rarity::{rarity_types::{Rarity}}, tools::ClientWrapper};

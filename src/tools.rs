@@ -1,4 +1,4 @@
-use scraper::{element_ref::Select};
+use scraper::element_ref::Select;
 
 pub fn getf32fromsel(s: &mut Select) -> f32 {
     s.next().unwrap().inner_html().replace("\n", "").replace("%", "").parse().unwrap_or(0.0)

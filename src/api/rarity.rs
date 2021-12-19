@@ -1,9 +1,7 @@
 use std::{str::FromStr, vec};
 
-use regex::Regex;
-
 use crate::tools::*;
-use scraper::{Html, Selector, element_ref::Select, ElementRef};
+use scraper::{Html, Selector};
 
 use rarity_types::*;
 

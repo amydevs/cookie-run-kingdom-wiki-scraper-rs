@@ -1,7 +1,11 @@
 use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 
 mod character;
-use crate::character::{Scraper, typesand::Character};
+mod rarity;
+mod tools;
+
+use crate::{tools::*, rarity::RarityTools};
+use crate::character::{CharacterTools, typesand::Character};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -30,23 +34,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     fs::create_dir_all(&assetspath).expect("Could not access fs.");
     println!("Output Directory: {:?}", fs::canonicalize(&basepath).unwrap());
-    
-    let scraper = Scraper::new();
+
+    // init clientwrapper
+    let clientwrapper = ClientWrapper::new();
 
     // url's of all characters
-    let allcharactersurls = scraper.get_characters_urls().await?;
+    let charactertools = CharacterTools::from_clientwrapper(&clientwrapper);
+    let allcharactersurls = charactertools.get_characters_urls().await?;
     println!("Getting Info for {} Cookies", allcharactersurls.len());
     // filling vector with characters
     let mut allcharacters:Vec<Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
-        let mut character = scraper.get_character(url).await?;
+        let mut character = charactertools.get_character(url).await?;
         
         #[cfg(feature = "debug")]
         if i == 4 {break;}
 
         // Save image
         if saveimgflag {
-            let imageres = scraper.client.get(&character.image_path).send().await?.bytes().await?;
+            let imageres = &clientwrapper.client.get(&character.image_path).send().await?.bytes().await?;
             let imagepath = &assetspath.join(character.name.to_owned() + ".png");
             fs::write(imagepath, imageres).expect("Image could not be written.");
             let temprelpath = imagepath.to_str().unwrap().to_owned().replace(&basepath.to_str().unwrap(), "./");
@@ -61,16 +67,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     fs::write(cookiesjsonpath, serde_json::to_string_pretty(&allcharacters).unwrap()).expect("JSON could not be written.");
 
     // rarity percentages
+    let raritytools = RarityTools::from_clientwrapper(&clientwrapper);
     if saveraritychanceflag {
         println!("Getting Gacha Chance Percentages");
-        let allraritychance = scraper.get_rarity_chances().await.unwrap_or(vec![]);
+        let allraritychance = raritytools.get_rarity_chances().await.unwrap_or(vec![]);
         fs::write(charrarityjsonpath, serde_json::to_string_pretty(&allraritychance).unwrap()).expect("JSON could not be written.");
     }
 
     // treasures (kinda buggy atm)
     if savetreasuresflag {
         println!("Getting Treasures");
-        let alltreasures = scraper.get_treasures().await.unwrap_or(vec![]);
+        let alltreasures = charactertools.get_treasures().await.unwrap_or(vec![]);
         fs::write(treasuresjsonpath, serde_json::to_string_pretty(&alltreasures).unwrap()).expect("JSON could not be written.");
     }
 

@@ -5,25 +5,16 @@ use regex::Regex;
 use scraper::{Html, Selector, element_ref::Select, ElementRef};
 
 use typesand::*;
+use crate::{rarity::{rarity_types::{Rarity}}, tools::ClientWrapper};
 
-pub struct Scraper {
-    base_url: String,
-    pub client: reqwest::Client,
+pub struct CharacterTools<'a> {
+    pub clientwrapper: &'a ClientWrapper,
     selectors: CharacterSelectors
 }
-impl Scraper {
-    pub fn new() -> Self {
+impl<'a> CharacterTools<'a> {
+    pub fn from_clientwrapper(clientwrapper: &'a ClientWrapper) -> Self {
         let inst = Self {
-            base_url: "https://cookierunkingdom.fandom.com".to_owned(),
-            client: reqwest::Client::new(),
-            selectors: CharacterSelectors::new()
-        };
-        return inst
-    }
-    pub fn from_client(client: reqwest::Client) -> Self {
-        let inst = Self {
-            base_url: "https://cookierunkingdom.fandom.com".to_owned(),
-            client: client,
+            clientwrapper: clientwrapper,
             selectors: CharacterSelectors::new()
         };
         return inst
@@ -31,7 +22,7 @@ impl Scraper {
 
     pub async fn get_characters_urls(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let mut urls:Vec<String> = vec![];
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
+        let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
         let selector = Selector::parse(".wikitable > tbody th > a:not(.image)").unwrap();
         for element in document.select(&selector) {
             if !element.inner_html().contains("non-playable") {
@@ -41,7 +32,7 @@ impl Scraper {
         Ok(urls)
     }
     pub async fn get_character(&self, url: &String) -> Result<Character, Box<dyn std::error::Error>> {
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, url)).send().await?.text().await?);
+        let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, url)).send().await?.text().await?);
         let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
         temptype.remove(0);
 
@@ -54,41 +45,15 @@ impl Scraper {
             r#type: CharacterType::from_str(temptype.as_str()).ok(),
             image_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
-            rarity: CharacterRarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),
+            rarity: Rarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),
             position: CharacterPos::from_str(temppos.as_str()).ok()
         };
         Ok(characterinst)
     }
 
-
-    pub async fn get_rarity_chances(&self) -> Result<Vec<RarityChances>, Box<dyn std::error::Error>> {
-        let mut rarities:Vec<RarityChances> = vec![];
-
-        let thsel = Selector::parse("th").unwrap();
-
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/Gacha")).send().await?.text().await?);
-        let table = document.select(&Selector::parse(".mw-parser-output > .wikitable").unwrap()).last().unwrap();
-
-        for (i, ele) in table.select(&Selector::parse("tr").unwrap()).enumerate() {
-            if i != 0 {
-                let mut selth = ele.select(&thsel);
-                rarities.push(RarityChances {
-                    rarity: CharacterRarity::from_str(selth.next().unwrap().first_child().unwrap().value().as_element().unwrap().attr("title").unwrap().replace(" Cookie", "").as_str()).ok(),
-                    cookie: self.getf32fromsel(&mut selth),
-                    soulstone: self.getf32fromsel(&mut selth)
-                })
-            }
-            
-        }
-        Ok(rarities)
-    }
-    fn getf32fromsel(&self, s: &mut Select) -> f32 {
-        s.next().unwrap().inner_html().replace("\n", "").replace("%", "").parse().unwrap_or(0.0)
-    }
-
     pub async fn get_treasures(&self) -> Result<Vec<Treasure>, Box<dyn std::error::Error>> {
         let mut temptreasures: Vec<Treasure> = vec![];
-        let document = Html::parse_document(&self.client.get(format!("{}{}", &self.base_url, "/wiki/Treasures")).send().await?.text().await?);
+        let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/Treasures")).send().await?.text().await?);
         let headerelesel = Selector::parse("table[border='0']").unwrap();
         let headersel = Selector::parse(".mw-headline").unwrap();
         let sel = Selector::parse("th[style='text-align:left']").unwrap();
@@ -102,7 +67,7 @@ impl Scraper {
                 temptreasures.push(Treasure {
                     name: first_child.attr("title").unwrap().to_owned(),
                     image_path: Regex::new(r"/revision/.*").unwrap().replace(first_child.attr("href").unwrap(), "").to_string(),
-                    rarity: CharacterRarity::from_str(raritytype.as_str()).unwrap()
+                    rarity: Rarity::from_str(raritytype.as_str()).unwrap()
                 })
             }
         }
@@ -112,6 +77,8 @@ impl Scraper {
 }
 
 pub mod typesand {
+    use crate::rarity::{rarity_types::{Rarity}};
+
     use serde::{Serialize, Deserialize};
     use strum_macros::EnumString;
     use scraper::Selector;
@@ -128,7 +95,7 @@ pub mod typesand {
         pub name: String,
         pub r#type: Option<CharacterType>,
         pub image_path: String,
-        pub rarity: Option<CharacterRarity>,
+        pub rarity: Option<Rarity>,
         pub position: Option<CharacterPos>
     }
 
@@ -147,21 +114,6 @@ pub mod typesand {
         Ranged,
         Support
     }
-
-    #[cfg_attr(not(feature = "enum-u8"), derive(Serialize, Deserialize))]
-    #[cfg_attr(feature = "enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
-    #[cfg_attr(feature = "debug", derive(Debug))]
-    #[derive(TS, EnumString)]
-    #[ts(export)]
-    pub enum CharacterRarity {
-        Special,
-        Common,
-        Rare,
-        Epic,
-        Legendary,
-        Ancient
-    }
-
     
     #[cfg_attr(not(feature = "enum-u8"), derive(Serialize, Deserialize))]
     #[cfg_attr(feature = "enum-u8", derive(Serialize_repr, Deserialize_repr), repr(u8))]
@@ -198,19 +150,9 @@ pub mod typesand {
     #[cfg_attr(feature = "debug", derive(Debug))]
     #[ts(export)]
     #[serde(rename_all = "camelCase")]
-    pub struct RarityChances {
-        pub rarity: Option<CharacterRarity>,
-        pub cookie: f32,
-        pub soulstone: f32
-    }
-
-    #[derive(Serialize, Deserialize, TS)]
-    #[cfg_attr(feature = "debug", derive(Debug))]
-    #[ts(export)]
-    #[serde(rename_all = "camelCase")]
     pub struct Treasure {
         pub name: String,
         pub image_path: String,
-        pub rarity: CharacterRarity
+        pub rarity: Rarity
     }
 }

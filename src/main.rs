@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // filling vector with characters
     let mut allcharacters:Vec<character_types::Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
-        let mut character = charactertools.get_character(url).await?;
+        let character = charactertools.get_character(url).await?;
         
         #[cfg(feature = "debug")]
         if i == 4 {break;}

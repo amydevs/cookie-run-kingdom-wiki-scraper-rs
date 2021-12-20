@@ -58,7 +58,7 @@ pub mod character_types {
 
     use serde::{Serialize, Deserialize};
     use strum_macros::EnumString;
-    use scraper::{Selector, element_ref::Select};
+    use scraper::{Selector};
     use ts_rs::TS;
 
     #[cfg(feature = "enum-u8")]

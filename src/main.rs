@@ -3,7 +3,7 @@ use std::{fs, env, io::{self, Write}, ops::Add, path::Path};
 mod api;
 mod tools;
 
-use crate::{tools::*, api::{character::*, rarity::*, treasure::*}};
+use crate::{tools::*, api::{character::{self, *}, rarity::*, treasure::*}};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -43,22 +43,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // filling vector with characters
     let mut allcharacters:Vec<character_types::Character> = vec![];
     for (i, url) in allcharactersurls.iter().enumerate() {
-        let character = charactertools.get_character(url).await?;
+        match charactertools.get_character(url).await {
+            Ok(character) => {
+                // Save image
+                if saveimgflag {
+                    let imagefoldpath = &assetspath.join(character.name.to_owned());
+                    fs::create_dir_all(&imagefoldpath).expect("Could not access fs.");
+                    fs::write(&imagefoldpath.join("illustration.png"), &clientwrapper.client.get(&character.illustration_img_path).send().await?.bytes().await?).expect("Image could not be written.");
+                    fs::write(&imagefoldpath.join("soulstone.png"), &clientwrapper.client.get(&character.soulstone_img_path).send().await?.bytes().await?).expect("Image could not be written.");
+                }
+
+                print!("\r\x1b[K{:.1}% Done | Cookie {} of {} | {}", (i as f32/allcharactersurls.len() as f32)*100.0, i+1, allcharactersurls.len(), &character.name);
+                io::stdout().flush().unwrap();
+                allcharacters.push(character);
+            },
+            Err(e) => {
+                println!("Error occured while getting character url: {} \n {}", url, e);
+                continue;
+            }
+        }
         
         #[cfg(feature = "debug")]
         if i == 4 {break;}
-
-        // Save image
-        if saveimgflag {
-            let imagefoldpath = &assetspath.join(character.name.to_owned());
-            fs::create_dir_all(&imagefoldpath).expect("Could not access fs.");
-            fs::write(&imagefoldpath.join("illustration.png"), &clientwrapper.client.get(&character.illustration_img_path).send().await?.bytes().await?).expect("Image could not be written.");
-            fs::write(&imagefoldpath.join("soulstone.png"), &clientwrapper.client.get(&character.soulstone_img_path).send().await?.bytes().await?).expect("Image could not be written.");
-        }
-
-        print!("\r\x1b[K{:.1}% Done | Cookie {} of {} | {}", (i as f32/allcharactersurls.len() as f32)*100.0, i+1, allcharactersurls.len(), &character.name);
-        io::stdout().flush().unwrap();
-        allcharacters.push(character);
     }
     println!("");
     fs::write(cookiesjsonpath, serde_json::to_string_pretty(&allcharacters).unwrap()).expect("JSON could not be written.");

@@ -31,7 +31,7 @@ impl<'a> CharacterTools<'a> {
         }
         Ok(urls)
     }
-    pub async fn get_character(&self, url: &String) -> Result<Character, Box<dyn std::error::Error>> {
+    pub async fn get_character(&self, url: &String) -> Result<Character, Box<dyn std::error::Error + Send + Sync>> {
         let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, url)).send().await?.text().await?);
         let mut temptype = document.select(&self.selectors.r#type).last().unwrap().text().collect::<String>();
         temptype.remove(0);

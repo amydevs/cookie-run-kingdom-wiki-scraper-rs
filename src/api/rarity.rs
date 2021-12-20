@@ -19,7 +19,7 @@ impl<'a> RarityTools<'a> {
     pub async fn get_rarity_chances(&self) -> Result<Vec<RarityChances>, Box<dyn std::error::Error>> {
         let mut rarities:Vec<RarityChances> = vec![];
 
-        let thsel = Selector::parse("th").unwrap();
+        let thsel = Selector::parse("th,td").unwrap();
 
         let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/Gacha")).send().await?.text().await?);
         let table = document.select(&Selector::parse(".mw-parser-output > .wikitable").unwrap()).last().unwrap();

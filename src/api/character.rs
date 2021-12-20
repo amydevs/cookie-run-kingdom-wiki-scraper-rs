@@ -25,7 +25,7 @@ impl<'a> CharacterTools<'a> {
         let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
         let selector = Selector::parse(".wikitable > tbody th").unwrap();
         for element in document.select(&selector) {
-            if !element.inner_html().contains("non-playable") {
+            if element.inner_html().contains("non-playable") {
                 urls.push(element.select(&Selector::parse("a:not(.image)").unwrap()).next().unwrap().value().attr("href").unwrap().to_owned());
             }
         }
@@ -43,7 +43,7 @@ impl<'a> CharacterTools<'a> {
             name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
             r#type: CharacterType::from_str(temptype.as_str()).ok(),
-            illustration_img_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.illustration_img_path)
+            illustration_img_path: Regex::new(r"/revision/.*")?.replace(document.select(&self.selectors.illustration_img_path)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
             soulstone_img_path: document.select(&self.selectors.soulstone_img_path).next().unwrap().value().attr("data-src").unwrap().to_owned(),
             rarity: Rarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),

@@ -43,8 +43,9 @@ impl<'a> CharacterTools<'a> {
             name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
             r#type: CharacterType::from_str(temptype.as_str()).ok(),
-            illustration_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
+            illustration_img_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.illustration_img_path)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
+            soulstone_img_path: document.select(&self.selectors.soulstone_img_path).next().unwrap().value().attr("data-src").unwrap().to_owned(),
             rarity: Rarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),
             position: CharacterPos::from_str(temppos.as_str()).ok()
         };
@@ -57,7 +58,7 @@ pub mod character_types {
 
     use serde::{Serialize, Deserialize};
     use strum_macros::EnumString;
-    use scraper::Selector;
+    use scraper::{Selector, element_ref::Select};
     use ts_rs::TS;
 
     #[cfg(feature = "enum-u8")]
@@ -70,7 +71,8 @@ pub mod character_types {
     pub struct Character {
         pub name: String,
         pub r#type: Option<CharacterType>,
-        pub illustration_path: String,
+        pub illustration_img_path: String,
+        pub soulstone_img_path: String,
         pub rarity: Option<Rarity>,
         pub position: Option<CharacterPos>
     }
@@ -106,7 +108,8 @@ pub mod character_types {
     pub struct CharacterSelectors {
         pub name: Selector,
         pub r#type: Selector,
-        pub imagepath: Selector,
+        pub illustration_img_path: Selector,
+        pub soulstone_img_path: Selector,
         pub rarity: Selector,
         pub position: Selector
     }
@@ -115,7 +118,8 @@ pub mod character_types {
             CharacterSelectors {
                 name: Selector::parse(".page-header__title#firstHeading").unwrap(),
                 r#type: Selector::parse("[data-source='role']").unwrap(),
-                imagepath: Selector::parse(".pi-image-thumbnail").unwrap(),
+                illustration_img_path: Selector::parse(".pi-image-thumbnail").unwrap(),
+                soulstone_img_path: Selector::parse("img[data-image-name*='Soulstone']").unwrap(),
                 rarity: Selector::parse("[data-source='rarity'] img").unwrap(),
                 position: Selector::parse("td[data-source='position']").unwrap()
             }

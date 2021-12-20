@@ -33,7 +33,7 @@ impl<'a> TreasureTools<'a> {
                 let first_child = e.first_child().unwrap().value().as_element().unwrap();
                 temptreasures.push(Treasure {
                     name: first_child.attr("title").unwrap().to_owned(),
-                    illustration_path: Regex::new(r"/revision/.*").unwrap().replace(first_child.attr("href").unwrap(), "").to_string(),
+                    img_path: Regex::new(r"/revision/.*").unwrap().replace(first_child.attr("href").unwrap(), "").to_string(),
                     rarity: Rarity::from_str(raritytype.as_str()).unwrap()
                 })
             }
@@ -58,7 +58,7 @@ pub mod treasure_types {
     #[serde(rename_all = "camelCase")]
     pub struct Treasure {
         pub name: String,
-        pub illustration_path: String,
+        pub img_path: String,
         pub rarity: Rarity
     }
 }

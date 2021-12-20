@@ -50,10 +50,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Save image
         if saveimgflag {
-            let imageres = &clientwrapper.client.get(&character.illustration_img_path).send().await?.bytes().await?;
             let imagefoldpath = &assetspath.join(character.name.to_owned());
             fs::create_dir_all(&imagefoldpath).expect("Could not access fs.");
-            fs::write(&imagefoldpath.join("illustration.png"), imageres).expect("Image could not be written.");
+            fs::write(&imagefoldpath.join("illustration.png"), &clientwrapper.client.get(&character.illustration_img_path).send().await?.bytes().await?).expect("Image could not be written.");
+            fs::write(&imagefoldpath.join("soulstone.png"), &clientwrapper.client.get(&character.soulstone_img_path).send().await?.bytes().await?).expect("Image could not be written.");
         }
 
         print!("\r\x1b[K{:.1}% Done | Cookie {} of {} | {}", (i as f32/allcharactersurls.len() as f32)*100.0, i+1, allcharactersurls.len(), &character.name);

@@ -23,10 +23,10 @@ impl<'a> CharacterTools<'a> {
     pub async fn get_characters_urls(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let mut urls:Vec<String> = vec![];
         let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/List_of_Cookies")).send().await?.text().await?);
-        let selector = Selector::parse(".wikitable > tbody th > a:not(.image)").unwrap();
+        let selector = Selector::parse(".wikitable > tbody th").unwrap();
         for element in document.select(&selector) {
             if !element.inner_html().contains("non-playable") {
-                urls.push(element.value().attr("href").unwrap_or_default().to_owned());
+                urls.push(element.select(&Selector::parse("a:not(.image)").unwrap()).next().unwrap().value().attr("href").unwrap().to_owned());
             }
         }
         Ok(urls)

@@ -43,7 +43,7 @@ impl<'a> CharacterTools<'a> {
             name: document.select(&self.selectors.name)
                 .next().unwrap().inner_html().replace("\t", "").replace("\n", ""),
             r#type: CharacterType::from_str(temptype.as_str()).ok(),
-            image_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
+            illustration_path: Regex::new(r"/revision/.*").unwrap().replace(document.select(&self.selectors.imagepath)
             .next().unwrap().value().attr("src").unwrap(), "").to_string(),
             rarity: Rarity::from_str(document.select(&self.selectors.rarity).next().unwrap().value().attr("alt").unwrap().replace("\"", "").as_str()).ok(),
             position: CharacterPos::from_str(temppos.as_str()).ok()
@@ -70,7 +70,7 @@ pub mod character_types {
     pub struct Character {
         pub name: String,
         pub r#type: Option<CharacterType>,
-        pub image_path: String,
+        pub illustration_path: String,
         pub rarity: Option<Rarity>,
         pub position: Option<CharacterPos>
     }

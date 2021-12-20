@@ -7,10 +7,10 @@ use scraper::{Html, Selector, ElementRef};
 use treasure_types::*;
 use crate::{api::rarity::{rarity_types::{Rarity}}, tools::ClientWrapper};
 
-pub struct TreasureTools<'a> {
+pub struct ToppingTools<'a> {
     pub clientwrapper: &'a ClientWrapper,
 }
-impl<'a> TreasureTools<'a> {
+impl<'a> ToppingTools<'a> {
     pub fn from_clientwrapper(clientwrapper: &'a ClientWrapper) -> Self {
         let inst = Self {
             clientwrapper: clientwrapper
@@ -43,7 +43,7 @@ impl<'a> TreasureTools<'a> {
     
 }
 
-pub mod treasure_types {
+pub mod topping_types {
     use crate::api::rarity::{rarity_types::{Rarity}};
 
     use serde::{Serialize, Deserialize};

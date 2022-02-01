@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="run --package crk-wiki-scraper --bin crk-wiki-scraper&#10;--features enum-u8,debug -- --save-imgs --save-chances --save-treasures " />
+  <configuration default="false" name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="command" value="run --package crk-wiki-scraper --bin crk-wiki-scraper&#10;--features enum-u8 -- --save-imgs --save-chances --save-treasures " />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <option name="channel" value="DEFAULT" />
     <option name="requiredFeatures" value="true" />

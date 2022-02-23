@@ -26,7 +26,6 @@ impl<'a> RarityTools<'a> {
 
         for (ri, row) in table.select(&Selector::parse("tr").unwrap()).enumerate() {
             for (i, ele) in row.select(&Selector::parse("th,td").unwrap()).enumerate() {
-                println!("{}\n",ele.html());
                 if i != 0 {
                     if i > rarities.len(){
                         rarities.push(RarityChances {

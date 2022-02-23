@@ -22,19 +22,29 @@ impl<'a> RarityTools<'a> {
         let thsel = Selector::parse("th,td").unwrap();
 
         let document = Html::parse_document(&self.clientwrapper.client.get(format!("{}{}", &self.clientwrapper.base_url, "/wiki/Gacha")).send().await?.text().await?);
-        let table = document.select(&Selector::parse(".mw-parser-output > .wikitable").unwrap()).last().unwrap();
+        let table = document.select(&Selector::parse(".wds-tab__content > .wikitable").unwrap()).next().unwrap();
 
-        for (i, ele) in table.select(&Selector::parse("tr").unwrap()).enumerate() {
-            if i != 0 {
-                let mut selth = ele.select(&thsel);
-                rarities.push(RarityChances {
-                    rarity: Rarity::from_str(selth.next().unwrap().first_child().unwrap().value().as_element().unwrap().attr("title").unwrap().replace(" Cookie", "").as_str()).ok(),
-                    cookie: getf32fromsel(&mut selth),
-                    soulstone: getf32fromsel(&mut selth)
-                })
+        for (ri, row) in table.select(&Selector::parse("tr").unwrap()).enumerate() {
+            for (i, ele) in row.select(&Selector::parse("th,td").unwrap()).enumerate() {
+                println!("{}\n",ele.html());
+                if i != 0 {
+                    if i > rarities.len(){
+                        rarities.push(RarityChances {
+                            rarity: None,
+                            cookie: 0.0,
+                            soulstone: 0.0,
+                        });
+                    }
+                    match ri {
+                        0 => rarities[i-1].rarity = Rarity::from_str(&ele.text().next().unwrap()).ok(),
+                        1 => rarities[i-1].soulstone = getf32fromstr(&ele.text().next().unwrap()),
+                        2 => rarities[i-1].cookie = getf32fromstr(&ele.text().next().unwrap()),
+                        _ => println!("out of bounds")
+                    }
+                }
             }
-            
         }
+
         Ok(rarities)
     }
 }
